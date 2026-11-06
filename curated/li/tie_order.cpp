@@ -1,6 +1,21 @@
 // 目的：验证「(rate desc, seq_idx asc) 这个比较键 → 截断取前 k 个后，每请求计数与平局顺序无关」
 // 以及反例：如果比较键只看 rate，计数就会随输入顺序/实现细节变。
 //
+// 一句话价值：证明「不稳定排序 + 截断」的风险只在切点落进等价块内部时出现；比较键补上第二字段
+//   （seq）后，同样 2000 次随机输入顺序，每请求计数的不稳定从 1716/2000 降到 0/2000。
+// 适用场景：自定义比较器 + 排序后截断/取 top-k，尤其是把「只按主键排序」当成等价简化的时候。
+// 限制 / 未验证：
+//   - 合成数据：4 请求 x 4 draft、rate 手工造全平局，不是真实 accept_rate 分布；
+//   - 只验过 g++ 12.2.0（Debian 12.2.0-14+deb12u1）+ -O2 -std=c++17 的 libstdc++；别的 STL
+//     实现的不稳定行为可能不同，但结论本身是「不能依赖它」，方向不因此改变；
+//   - 只统计「每请求拿到几个槽」；下游若要位置集合，这里没覆盖；
+//   - 没进 deepinfer 实跑，只是按下面的坐标复现了同样的比较键与截断逻辑。
+// 对应源码坐标（一手阅读，deepinfer HEAD a679bb8，2026-11-03）：
+//   - 比较键 csrc/engine/mtp_varlen.hpp:210-212（rate 不等比 rate，否则比 seq 升序）
+//   - 排序   同文件 :213-214（acc_queue_for_bsz / acc_queue_for_seqs_q 各排一次）
+//   - 截断   同文件 :263-265（seqlens_q 先全置 1，再对排序结果前 best_bsz - num_seqs 个 += 1）
+//   - 入口   同文件 :150-156（schedule(scheduled, seqlens_q)）
+//
 // 对应 notes/mtp-varlen-sim.py 的实验 C（那里是 Python 枚举，这里用真实 std::sort + 随机输入顺序）。
 // 编译：g++ -O2 -std=c++17 -o tie_order tie_order.cpp
 // 跑法：./tie_order
@@ -23,12 +38,12 @@ static std::vector<Item> build(const std::vector<double>& rates, int nd, int nse
     return q;
 }
 
-// 截断取前 k 个，统计每个请求拿到多少个（源码里 seqlens_q 就是这类计数）
+// 截断取前 k 个，统计每个请求拿到多少个（源码 csrc/engine/mtp_varlen.hpp:263-265 就是这类计数）
 static std::vector<int> counts(std::vector<Item> q, int k, bool key_with_seq) {
     if (key_with_seq)
         std::sort(q.begin(), q.end(), [](const Item& a, const Item& b) {
             if (a.rate != b.rate) return a.rate > b.rate;
-            return a.seq < b.seq;          // 源码 by_rate_desc 的比较键
+            return a.seq < b.seq;          // 源码 by_rate_desc，mtp_varlen.hpp:210-212
         });
     else
         std::sort(q.begin(), q.end(), [](const Item& a, const Item& b) {
