@@ -1,6 +1,6 @@
 # 任务是「跑完了但收尾写不进去」：错误别急着抹掉
 
-- **一句话价值**：带 claim/租约的 SQLite 任务星列，handler 跑完那条 `DELETE`/`UPDATE`
+- **一句话价值**：带 claim/租约的 SQLite 任务队列，handler 跑完那条 `DELETE`/`UPDATE`
   因为锁写不进去时，不许当场把记录改回 ready，否则队列「自己知道出事了」而牌子显示无事；
   正确契约是**卡住的 claim 只该让这件事多跑一遍，不该丢效果，也不该一直红着**。
 - **适用场景**：自己拿 SQLite 当队列，用 `owner = 自己` 当占位（claim）、用租约防僵尸的 worker。
