@@ -18,6 +18,11 @@
 
 第一个数字是关键：0 毫秒说明 busy handler 根本没被调用，`busy_timeout` 完全没参与。
 
+复现不必上多进程：同一个容器里开两个 `python3 -m sqlite3` 会话就够——A 会话 `BEGIN IMMEDIATE`
+持锁不放；B 会话先 `PRAGMA busy_timeout=3000`，再走 deferred `BEGIN` → `SELECT` → `INSERT`，
+当场 `database is locked`，耗时 0 毫秒。同一个 B 会话把最外层换成 `BEGIN IMMEDIATE`，
+重复同样的读后写，会等满 3000 毫秒才报错。两次的数字差就是「busy handler 有没有被调用」。
+
 ## 为什么
 
 SQLite 对「已经持有**读**锁的事务里再要**写**锁」这种升级不做等待——它不调 busy handler，
