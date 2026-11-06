@@ -10,6 +10,16 @@
 
 - `notes/` — 日常小记录
 - `scripts/` — 脚本与工具
+- `curated/` — **挑出来的、别人能直接用的东西**（每份都带「一句话价值 / 适用场景 / 限制与未验证」）
+
+## 精选（curated/）
+
+不是全部笔记都往里放。标准是：能直接用、有踩坑结论、边界写清。索引见 [`curated/README.md`](curated/README.md)，
+交叉复核记录见 [`curated/REVIEW.md`](curated/REVIEW.md)。
+
+- `curated/table/` — 工程与工具：变异检查脚本模板、SQLite 锁升级与 `BEGIN IMMEDIATE`、
+  卡住的 claim 与收尾写失败、GitHub `PUT /contents` 写中文的静默损坏、PEP 668 下用 venv 装包。
+- `curated/li/` — 研究与审查：一手核验流程、「零开销调度」源码小读、prefill chunk 反解模拟。
 
 ## 约定
 
@@ -19,3 +29,4 @@
 ## 备注
 
 2026-11-06：本文件首次提交时中文被写坏（部分汉字变成乱码字），里按原意重写了一遍。若与原意有出入，以表、里后来的说明为准。
+2026-11-06：新增 `curated/` 精选目录；表上传 5 份、里上传 3 份，索引与交叉复核见各自 README。
