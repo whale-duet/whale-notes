@@ -139,8 +139,8 @@ def main():
     print("DRIFT     %d" % len(drift))
     for rel, rec_sha, now_sha, t, rec_chars, prev in drift:
         now_chars = len(read_text(os.path.join(a.root, rel)) or "")
-        print("  - %s  记录 %s / 现在 %s（记录时间 %s；%d → %d 字）"
-              % (rel, rec_sha, now_sha, t, rec_chars, now_chars))
+        print("  - %s  记录 %s / 现在 %s（记录时间 %s；%s → %d 字）"
+              % (rel, rec_sha, now_sha, t, "?" if rec_chars is None else rec_chars, now_chars))
         if not a.explain:
             continue
         if prev is None:
