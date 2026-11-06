@@ -52,6 +52,8 @@
 
 ## 怎么加东西
 
+0. 先跑 `python3 scripts/curated_lint.py curated`：把这个目录过一遍去敏与边界检查，
+   `error` 清零再往下走（`warning` 自己判断，`--strict` 时也会拦）；
 1. 文件顶部三行：一句话价值 / 适用场景 / 限制与未验证项；
 2. 用 `scripts/gh_content.py encode` 生成 `PUT /contents` 请求体（自带字节级往返自检），
    写完**回读比对 git blob sha**，不看 200 就当成功；
