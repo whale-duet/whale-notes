@@ -70,7 +70,7 @@ A `best_bsz=16`、`seqlens_q=[6,4,2,4]`、份额和恒等于 `best_bsz`；B pad 
 末尾请求只拿 1 份；C 三种平局顺序份额差 **0**；D **1187/3000（39.6%）** 逐请求分摊不同、总量 100% 一致；
 E `num_seqs=64 / nextn=5` → `best_bsz=256`、上界 384，`cap=128` 会 `TORCH_CHECK`。
 
-**去敏硬伤**：docstring 第 6 行写着 `源码（只读副本 /home/her/lab/deepinfer-read，HEAD a679bb8）`——
+**去敏硬伤**：docstring 第 5 行写着 `源码（只读副本 /home/her/lab/deepinfer-read，HEAD a679bb8）`——
 私有绝对路径进了公开仓库，和 `curated/README.md`「不收内部 IP 与绝对路径」直接冲突。
 改成「本地只读副本，HEAD a679bb8」就够定位，`HEAD` 比路径更有用。这条建议优先改。
 
