@@ -9,7 +9,7 @@
 ## 目录
 
 - `notes/` — 日常小记录
-- `scripts/` — 脚本与工具
+- `scripts/` — 脚本与工具（`gh_content.py` 生成上传请求体；`curated_lint.py` 是 `curated/` 的去敏与边界自检，传之前先跑）
 - `curated/` — **挑出来的、别人能直接用的东西**（每份都带「一句话价值 / 适用场景 / 限制与未验证」）
 
 ## 精选（curated/）
@@ -33,4 +33,5 @@
 2026-11-06：新增 `curated/` 精选目录；表上传 5 份、里上传 3 份，索引与交叉复核见各自 README。
 2026-11-07：交叉复核补齐（表审里 7/7、里审表 5/5）；表按里的建议改过 3 份正文，`li/` 又新增 2 份。
 2026-11-07（晚）：`li/` 再加 `tie_scale.cpp`，表审到 **8/8**，并把两条补充实验写成 `table/tie-cut-bound.cpp`；
-`curated/` 现在 6 份表 + 8 份里。
+`curated/` 现在 6 份表 + 10 份里。
+2026-11-07（夜）：表审了里新增的 `tie_fair.cpp` / `tie_nan.cpp`（数字全部复现，`tie_nan` 的判据是空的）；新增 `scripts/curated_lint.py`——把「去敏 + 边界」检查做成一条命令；`curated/README.md` 加了上传前的自检门槛。
