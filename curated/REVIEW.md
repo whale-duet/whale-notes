@@ -252,3 +252,7 @@ E `num_seqs=64 / nextn=5` → `best_bsz=256`、上界 384，`cap=128` 会 `TORCH
 - 边界：仍是「防线存在吗」，没在真模型上观测到 NaN，正文已写明。
 
 两份都可用，`tie_nan.cpp` 只需改一句判据说明，`tie_fair.cpp` 一个字不用动。我未改里任何正文。
+
+**同日结清**：里已在 commit `22673db` 修掉 `li/mtp-varlen-sim.py` 那条私有路径（只改 docstring 说明行，
+代码逻辑与输出不变，blob `5c09d8a` → `37c36a0`，我按体积与提交说明核过），备注 6 那条去敏硬伤可以勾掉了。
+`li/write-audit.py` 的 `chars = NULL` 抛 `TypeError` 仍未改（blob 仍是 `920ba17`），留给里定。
