@@ -9,13 +9,26 @@
 #   2. 顶部改 SPEC 和 MUTANTS；
 #   3. ./mutation-check.sh
 #
-# MUTANTS 每行：文件|原文|替换成|标签
+# MUTANTS 每行一个数组元素，**整行用单引号包住**：'文件|原文|替换成|标签'
+#   例：'src/app/effects.ts|return Number(result.changes) === 1|return true|claim 恒真'
+#   忘了加引号时 bash 不会提示「缺引号」，会直接报 syntax error near unexpected token '|'
+#   ——踩过一次，这里写明白。
 #   原文必须在该文件里**只出现一次**，否则脚本直接放弃（避免改错地方）。
+#   原文和替换文本里**不能含 `|`**：MUTANTS 用 `|` 分段，文本里一旦有它就会被切断，
+#   而且断在中间时报的是「原文出现 0 次，放弃」，看起来像原文写错了，容易查错方向。
 #
 # 环境变量：
 #   TREE    仓库根（默认当前目录）
 #   RUNNER  跑测试的命令（默认 "npx vitest run"，会自动追加 spec 路径）
 #   TIMEOUT 单次运行的秒数上限（默认 600）
+#
+# 限制 / 未验证：
+#   - 只支持「单点文本替换」：原文必须唯一出现一次，不支持多行、正则、结构性变异；
+#   - 依赖 bash（数组、here-string、`${VAR}`），Windows 原生 cmd 不行，需 WSL/Git Bash；
+#   - 识别 RED/GREEN 靠抓 vitest 的 `Tests N failed|passed` 行，换测试框架要改 run() 里的正则；
+#   - 只在本地单机上用过；并行跑两个实例会互相覆盖同一批文件，没做锁。
+#
+# 中断保护：Ctrl-C / kill 时 trap 会把变异原样还回去，避免 `*.mutbak` 和变异版本留在工作树里。
 set -u
 
 TREE=${TREE:-$PWD}
@@ -26,7 +39,7 @@ SPEC=${SPEC:?请先设置 SPEC（要跑的定向测试文件）}
 cd "$TREE" || { echo "TREE 不存在：$TREE"; exit 1; }
 
 MUTANTS=(
-  # 例：src/app/effects.ts|return Number(result.changes) === 1|return true|claim 恒真
+  # 例：'src/app/effects.ts|return Number(result.changes) === 1|return true|claim 恒真'
 )
 
 strip_ansi() { sed 's/\x1b\[[0-9;]*m//g'; }
@@ -49,6 +62,19 @@ run() { # $1 = 标签；输出一行结论
   fi
 }
 
+# 当前正在变异的文件；非空就说明工作树里有一处变异没还回去
+CUR_FILE=""
+restore_now() {
+  if [ -n "$CUR_FILE" ] && [ -f "$CUR_FILE.mutbak" ]; then
+    mv -f "$CUR_FILE.mutbak" "$CUR_FILE"
+    echo "  !! 已中断，$CUR_FILE 已还原" >&2
+  fi
+  CUR_FILE=""
+}
+# 退出码先存下来再还原，免得 trap 把脚本的失败码改成 0
+trap 'rc=$?; restore_now; exit $rc' EXIT
+trap 'restore_now; exit 130' INT TERM HUP
+
 mutate_and_run() { # $1 文件 $2 原文 $3 替换 $4 标签
   local f=$1 old=$2 new=$3 label=$4
   [ -f "$f" ] || { echo "  [$label] 跳过：没有 $f"; return 2; }
@@ -65,9 +91,11 @@ if n != 1:
 open(p, "w", encoding="utf-8").write(s.replace(old, new))
 PY
   then rm -f "$f.mutbak"; return 2; fi
+  CUR_FILE=$f
   run "$label"
   local verdict=$?
   mv -f "$f.mutbak" "$f"
+  CUR_FILE=""
   return $verdict
 }
 
