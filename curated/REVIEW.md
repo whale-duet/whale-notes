@@ -13,7 +13,7 @@
 | `li/prefill-chunk-sim.py` | 过：无路径、无 token、无硬编码主机 | 注释中文正确 | 过：开头就声明「系数是自造值，不能当真实性能数字」 | 可用，断言我独立复算过 |
 | `li/write-audit.py` | 过：无主机、无 token、无私有路径（示例用 `~/work`、`rec.sqlite`） | 过：术语前后一致 | **缺**：docstring 写了假设，但没有「限制 / 未验证」小节 | 可用，**查出 1 个真实缺陷**（见备注 4） |
 | `li/official-entry-checklist.md` | 过：示例域名是 `example-` 保留域，无真实站点 | 过 | 过：第五节专设「边界 / 未验证」 | 可用，无硬伤（见备注 5） |
-| `li/mtp-varlen-sim.py` | **不过**：docstring 里有私有绝对路径 `/home/her/lab/...` | 过 | 过：明写系数自造、结论只到形状与边界 | 内容可用，**去敏必须改**（见备注 6） |
+| `li/mtp-varlen-sim.py` | **不过**：docstring 里有私有绝对路径（已打码：`/home/＜用户＞/lab/…`） | 过 | 过：明写系数自造、结论只到形状与边界 | 内容可用，**去敏必须改**（见备注 6） |
 | `li/tie_order.cpp` | 过：无路径、无主机、无 token | 过 | **缺**：文件里没有「限制 / 未验证」，只在索引里写了 | 可用，数字我复现了（见备注 7） |
 | `li/tie_scale.cpp` | 过：`grep` 路径 / IP / token / 邮箱，0 命中 | 过：术语与 `tie_order.cpp` 一致 | **缺**：只有编译与跑法，没有「限制 / 未验证」（索引里有） | 可用，数字我独立复现，**有一条结论要修正**（见备注 8） |
 
@@ -71,7 +71,7 @@ A `best_bsz=16`、`seqlens_q=[6,4,2,4]`、份额和恒等于 `best_bsz`；B pad 
 末尾请求只拿 1 份；C 三种平局顺序份额差 **0**；D **1187/3000（39.6%）** 逐请求分摊不同、总量 100% 一致；
 E `num_seqs=64 / nextn=5` → `best_bsz=256`、上界 384，`cap=128` 会 `TORCH_CHECK`。
 
-**去敏硬伤**：docstring 第 5 行写着 `源码（只读副本 /home/her/lab/deepinfer-read，HEAD a679bb8）`——
+**去敏硬伤**：docstring 第 5 行写着 `源码（只读副本 /home/＜用户＞/lab/…，HEAD a679bb8）`——
 私有绝对路径进了公开仓库，和 `curated/README.md`「不收内部 IP 与绝对路径」直接冲突。
 改成「本地只读副本，HEAD a679bb8」就够定位，`HEAD` 比路径更有用。这条建议优先改。
 
