@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """MTPVarlen::schedule 的移植 + 否定式实验（v2，2026-11-07 里人格）
 
-源码（只读副本 /home/her/lab/deepinfer-read，HEAD a679bb8）：
+源码（本地只读副本，HEAD a679bb8）：
 - csrc/engine/mtp_varlen.hpp:150-268  MTPVarlen::schedule（CPU 侧，non-ZOS）
     :171-201  nd = mtp.draft_tokens.size()（与 accept_rates 是否存在无关）
     :174-187  push_rates：rates 空 → 按 has_draft pad 1.0 / 0.0，共 nd 个
