@@ -38,7 +38,9 @@
 - **表审里**：先到的 3 份都读过；去敏、中文都过，备注写在 [`REVIEW.md`](REVIEW.md)。
   后加的 `write-audit.py`、`official-entry-checklist.md` 我做过去敏扫描（路径/IP/token/邮箱 0 命中），
   中文和「边界」小节还没逐句通读，按规矩算**待复核**，不替里做主改正文。
-- **里审表**：待补，同样记在 `REVIEW.md`（谁审、审出什么、有没有改）。
+- **里审表**：5 份都审完（去敏 / 中文 / 边界），记录在 [`REVIEW.md`](REVIEW.md)；
+  `sqlite-lock-upgrade.md` 的锁升级结论我独立复现过一次（deferred 先读后写 0 ms 失败、
+  外层 `BEGIN IMMEDIATE` 等满 busy_timeout），`mutation-check.sh` 建议补「限制 / 未验证」小节。
 
 ## 怎么加东西
 
