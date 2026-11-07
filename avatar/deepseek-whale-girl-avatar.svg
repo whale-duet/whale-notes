@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="DeepSeek 小鲸鱼 Q 版头像">
+  <title>DeepSeek 小鲸鱼 · 蓝白长发鲸尾 Q 版头像</title>
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="32%" r="78%">
+      <stop offset="0%" stop-color="#F7FCFF"/>
+      <stop offset="52%" stop-color="#D8EEFF"/>
+      <stop offset="100%" stop-color="#A4D2F7"/>
+    </radialGradient>
+    <linearGradient id="hairBack" x1="0.15" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#4E9CE4"/>
+      <stop offset="45%" stop-color="#2C6EC4"/>
+      <stop offset="100%" stop-color="#163C78"/>
+    </linearGradient>
+    <linearGradient id="hairFront" x1="0.2" y1="0" x2="0.4" y2="1">
+      <stop offset="0%" stop-color="#74B9F0"/>
+      <stop offset="48%" stop-color="#3A82D2"/>
+      <stop offset="100%" stop-color="#1B4C90"/>
+    </linearGradient>
+    <linearGradient id="skinGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFF4EC"/>
+      <stop offset="68%" stop-color="#FFE2D1"/>
+      <stop offset="100%" stop-color="#FAD0BC"/>
+    </linearGradient>
+    <linearGradient id="tailGrad" x1="0.1" y1="0.05" x2="0.85" y2="1">
+      <stop offset="0%" stop-color="#A8E0FF"/>
+      <stop offset="50%" stop-color="#4E9FE4"/>
+      <stop offset="100%" stop-color="#1F5AA4"/>
+    </linearGradient>
+    <linearGradient id="clothGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#D5E9FB"/>
+    </linearGradient>
+    <radialGradient id="cheekGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FF93AE" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#FF93AE" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="512" height="512" fill="url(#bgGrad)"/>
+  <circle cx="256" cy="256" r="236" fill="#FFFFFF" opacity="0.16"/>
+  <g fill="#FFFFFF" opacity="0.5">
+    <circle cx="84" cy="128" r="11"/>
+    <circle cx="116" cy="90" r="6"/>
+    <circle cx="432" cy="112" r="14"/>
+    <circle cx="466" cy="192" r="7"/>
+    <circle cx="66" cy="332" r="8"/>
+  </g>
+  <g fill="#FFFFFF" opacity="0.85">
+    <path d="M104 196 L110 214 L128 220 L110 226 L104 244 L98 226 L80 220 L98 214 Z"/>
+    <path d="M418 300 L422 312 L434 316 L422 320 L418 332 L414 320 L402 316 L414 312 Z"/>
+  </g>
+
+  <!-- 后发 -->
+  <path d="M256 94 C 152 94 100 180 100 278 C 100 364 122 436 158 484 L 354 484 C 390 436 412 364 412 278 C 412 180 360 94 256 94 Z"
+        fill="url(#hairBack)"/>
+  <g fill="none" stroke="#8CC7F4" stroke-opacity="0.4" stroke-width="5" stroke-linecap="round">
+    <path d="M134 302 C 142 352 156 400 178 442"/>
+    <path d="M378 302 C 370 352 356 400 334 442"/>
+  </g>
+
+  <!-- 脖子 -->
+  <path d="M230 316 L 230 392 C 230 408 282 408 282 392 L 282 316 Z" fill="#F2C6AF"/>
+  <path d="M232 330 C 244 344 268 344 280 330 L 280 348 C 266 360 246 360 232 348 Z" fill="#E5AE95" opacity="0.75"/>
+
+  <!-- 衣服 -->
+  <path d="M256 392 C 208 392 168 416 148 472 C 142 486 138 500 136 512 L 376 512 C 374 500 370 486 364 472 C 344 416 304 392 256 392 Z"
+        fill="url(#clothGrad)"/>
+  <path d="M256 392 C 234 404 214 412 196 416 C 204 444 226 462 256 468 C 286 462 308 444 316 416 C 298 412 278 404 256 392 Z"
+        fill="#EAF6FF" stroke="#8CC3EA" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M228 408 C 238 432 246 448 256 460 C 266 448 274 432 284 408" fill="none"
+        stroke="#A7D5F1" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- 垂在肩前的长发 -->
+  <g fill="url(#hairFront)">
+    <path d="M130 396 C 146 432 154 464 158 492 C 172 466 182 438 186 408 Z"/>
+    <path d="M382 396 C 366 432 358 464 354 492 C 340 466 330 438 326 408 Z"/>
+  </g>
+
+  <!-- 鲸鱼尾巴 -->
+  <g transform="translate(400,434) rotate(10) scale(0.85)">
+    <path d="M-5 60 C -12 30 -24 8 -50 -4 C -76 -16 -102 -12 -116 2 C -92 9 -70 26 -60 48 C -52 67 -47 84 -45 96 C -30 76 -16 65 -5 60 Z"
+          fill="url(#tailGrad)" stroke="#F2FBFF" stroke-opacity="0.55" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M5 60 C 12 30 24 8 50 -4 C 76 -16 102 -12 116 2 C 92 9 70 26 60 48 C 52 67 47 84 45 96 C 30 76 16 65 5 60 Z"
+          fill="url(#tailGrad)" stroke="#F2FBFF" stroke-opacity="0.55" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M-8 52 C -22 32 -38 18 -58 10" fill="none" stroke="#D6F1FF" stroke-opacity="0.75" stroke-width="7" stroke-linecap="round"/>
+    <path d="M8 52 C 22 32 38 18 58 10" fill="none" stroke="#D6F1FF" stroke-opacity="0.75" stroke-width="7" stroke-linecap="round"/>
+    <path d="M-4 62 C -6 78 -8 88 -12 96" fill="none" stroke="#BFE4FF" stroke-opacity="0.45" stroke-width="6" stroke-linecap="round"/>
+  </g>
+
+  <!-- 脸 -->
+  <path d="M256 148 C 192 148 166 196 166 248 C 166 294 186 324 214 338 C 226 345 244 348 256 348 C 268 348 286 345 298 338 C 326 324 346 294 346 248 C 346 196 320 148 256 148 Z"
+        fill="url(#skinGrad)"/>
+
+  <!-- 腮红 -->
+  <ellipse cx="198" cy="298" rx="27" ry="14" fill="url(#cheekGrad)"/>
+  <ellipse cx="314" cy="298" rx="27" ry="14" fill="url(#cheekGrad)"/>
+  <g stroke="#FF8494" stroke-opacity="0.6" stroke-width="3.5" stroke-linecap="round">
+    <path d="M188 294 L 186 302"/>
+    <path d="M199 293 L 197 301"/>
+    <path d="M210 294 L 208 302"/>
+    <path d="M302 294 L 300 302"/>
+    <path d="M313 293 L 311 301"/>
+    <path d="M324 294 L 322 302"/>
+  </g>
+
+  <!-- 眉毛：外高内低，傲娇 -->
+  <g fill="none" stroke="#2B6BC0" stroke-width="7" stroke-linecap="round">
+    <path d="M184 232 C 202 226 220 230 234 240"/>
+    <path d="M328 232 C 310 226 292 230 278 240"/>
+  </g>
+
+  <!-- 闭眼 -->
+  <g fill="none" stroke="#173F6C" stroke-width="8" stroke-linecap="round">
+    <path d="M190 270 C 202 251 224 251 236 268"/>
+    <path d="M322 270 C 310 251 288 251 276 268"/>
+  </g>
+  <g fill="none" stroke="#173F6C" stroke-width="5.5" stroke-linecap="round">
+    <path d="M190 270 L 182 265"/>
+    <path d="M322 270 L 330 265"/>
+  </g>
+
+  <!-- 嘴：小小撇嘴 -->
+  <path d="M242 314 C 248 323 255 317 256 316" fill="none" stroke="#C4675F" stroke-width="5" stroke-linecap="round"/>
+  <path d="M270 314 C 264 323 257 317 256 316" fill="none" stroke="#C4675F" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- 刘海 -->
+  <path d="M162 224 C 154 156 198 110 256 110 C 314 110 358 156 350 224
+           C 340 192 330 176 318 168
+           C 322 190 318 206 308 218
+           C 302 200 292 182 280 170
+           C 282 194 276 208 266 220
+           C 262 202 254 182 244 170
+           C 242 194 234 208 224 218
+           C 220 200 212 182 200 170
+           C 200 192 192 206 180 218 Z"
+        fill="url(#hairFront)"/>
+
+  <!-- 侧发 -->
+  <g fill="url(#hairFront)">
+    <path d="M168 200 C 148 250 144 318 154 392 C 158 418 164 440 170 458 C 178 434 184 406 186 378 C 178 332 176 288 182 242 C 180 222 176 208 168 200 Z"/>
+    <path d="M344 200 C 364 250 368 318 358 392 C 354 418 348 440 342 458 C 334 434 328 406 326 378 C 334 332 336 288 330 242 C 332 222 336 208 344 200 Z"/>
+  </g>
+
+  <!-- 发丝高光 -->
+  <path d="M196 156 C 226 126 292 124 322 152 C 288 142 232 142 196 156 Z" fill="#D6F0FF" opacity="0.55"/>
+  <path d="M204 180 C 214 164 226 156 238 150 C 228 166 222 182 220 198 Z" fill="#E4F6FF" opacity="0.4"/>
+  <path d="M181 264 C 177 302 179 348 187 386 C 183 348 181 302 181 264 Z" fill="#9ED4F7" opacity="0.45"/>
+
+  <!-- 小鱼尾发饰 -->
+  <g transform="translate(346,206) rotate(16) scale(0.4)">
+    <path d="M-5 60 C -12 30 -24 8 -50 -4 C -76 -16 -102 -12 -116 2 C -92 9 -70 26 -60 48 C -52 67 -47 84 -45 96 C -30 76 -16 65 -5 60 Z"
+          fill="#FFFFFF"/>
+    <path d="M5 60 C 12 30 24 8 50 -4 C 76 -16 102 -12 116 2 C 92 9 70 26 60 48 C 52 67 47 84 45 96 C 30 76 16 65 5 60 Z"
+          fill="#FFFFFF"/>
+    <path d="M-5 60 C -12 30 -24 8 -50 -4 C -76 -16 -102 -12 -116 2 C -92 9 -70 26 -60 48 C -52 67 -47 84 -45 96 C -30 76 -16 65 -5 60 Z"
+          fill="none" stroke="#63AEE8" stroke-width="11" stroke-linejoin="round"/>
+    <path d="M5 60 C 12 30 24 8 50 -4 C 76 -16 102 -12 116 2 C 92 9 70 26 60 48 C 52 67 47 84 45 96 C 30 76 16 65 5 60 Z"
+          fill="none" stroke="#63AEE8" stroke-width="11" stroke-linejoin="round"/>
+  </g>
+</svg>
