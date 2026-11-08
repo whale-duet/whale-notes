@@ -1,0 +1,93 @@
+# 在线紧凑 SQLite：三条路、实测数字、一个驱动语义陷阱
+
+- **一句话价值**：一张能直接抄的选型表（分块 `incremental_vacuum` / 一次性 `VACUUM` / `VACUUM INTO` 换库），加上三个真会静默坑人的点：`incremental_vacuum(N)` 的 N 在部分版本里**完全被忽略**、`busy_timeout` 在两个官方驱动里**语义相反**、`VACUUM INTO` 换库**不锁写方但会吞并发写**。数字都来自本机合成库实测，不是拍脑袋。
+- **适用场景**：一个边写边长的 SQLite 库（日志/遥测/会话记录）删了大量历史行后文件不缩；需要在**服务不停写入**的前提下回收磁盘；或者你要写的"在线整理"脚本要在 python 和 node 两端跑同一套参数。
+- **限制**：合成库、单机本地磁盘（容器 overlay）、单写方；没测网络盘/NFS、没测多写方争锁、没测 WAL 上限与 checkpoint 饥饿的组合；所有秒数是这台机器的绝对速度，跨机器只能看**比例和形状**（尤其"写方 p95 抬到多少"这一列）。版本也只是 python 3.11.2 + SQLite 3.40.1 与 Node 24.22 + SQLite 3.53.4 这两组。
+
+## 0. 先给结论
+
+| 你的处境 | 该走哪条 | 代价 |
+| --- | --- | --- |
+| 能接受秒级停写，或库不大（< 数 GiB） | `VACUUM INTO` 新文件 + 原子换库 | 停写窗口实测 **2.02 s**，其中 1.71 s 是窗口里那次 `VACUUM INTO`；rename+重开+PRAGMA 复位本身只要 **0.31 s** |
+| 一秒都不能停，写入不能丢 | 分块 `incremental_vacuum` + 限速 + 让路 | 时间长：540k 页 ≈ **11 分钟**；好处是写方 p95 只抬到 5.7 ms |
+| 只是想把 freelist 搬空，写方很闲 | 循环裸跑 `incremental_vacuum` | 2 GiB / 452k 页 **280 s**，但写方吞吐被打到 1.3 条/秒、尾部 11.6 s |
+
+一句话：**能量化就选换库，不能停写就选限速分块，别裸跑分块。**
+
+## 1. 三条路的实测（2 GiB 合成库，freelist 452,665 页）
+
+造库：526k 页 / 2,066.6 MiB，删 85% 行后留下 225,883 行，freelist 452,665 页（源文件仍是 2 GiB）。
+
+**a) 一次性 `VACUUM INTO`**：1.34 s（在线跑 1.26 s）产出 295 MiB 新库，quick_check ok。
+- 优点：快到不像话，磁盘只要**多 295 MiB**就能做；不阻塞写方（实测在真空期间边写边真空，写方整个过程 p95 4.1 ms、零失败）。
+- 代价：输出是**快照**，真空期间发生的并发写会丢——实测 32 条；输出库 `journal_mode` 复位成 `delete`，换库后要重新设回 `wal`；`auto_vacuum` 会跟着源库（本例仍是 2=incremental），这一点别搞反。
+- 换库停写窗口：先停写，再做一次 `VACUUM INTO`（1.714 s），然后 `os.replace` 原子换 + 重开 + PRAGMA 复位（0.307 s），合计 **2.021 s**；换完新进程直接接上写，吞吐回到 39.7 条/秒。想再压停写时间，就把 vacuum 挪到停写前做——但要接受"那一份快照会落后于停写瞬间"，所以之后还得补一次（或者接受丢最后那几秒的写）。
+
+**b) 分块 `incremental_vacuum` + 限速（eth=800 页/秒）**：
+- 60 s 窗口搬 48,000 页，写方 2,295 次写全成功、p50 0.9 ms / **p95 5.7 ms** / p99 55 ms / max 332 ms；写方吞吐 38.1 条/秒（基线 39.7）→ **基本无损**。
+- 540k 页 ETA **11.2 分钟**。
+
+**c) 裸跑分块（不限速）**：
+- 452,665 页 279.75 s，1,618 页/秒；带写方时 262.5 s，写方只剩 **1.3 条/秒**，p95 4.1 s、max 11.6 s——这就是"在线整理把线上写崩"的现场。
+- 单次调用的成本很低：p50 0.35 ms、p95 1.0–1.5 ms，所以限速不靠 sleep 长，靠在**块间隔**上让路。
+
+## 2. 陷阱一：`incremental_vacuum(N)` 里的 N 不一定是"搬 N 页"
+
+SQLite 3.40.1（python 3.11.2 自带）实测：`PRAGMA incremental_vacuum` 连续 12 次调用，不管写 `1 / 100 / 1000 / 4000`，**每次都只回收 1 页**。
+
+后果是双向的：
+- 如果你按"一次搬 N 页"估算耗时，结论会离谱（我们之前就因此算出"54 万页要 8 小时"，实测 280 s，作废）；
+- 如果你以为"传 4000 就一次搬 4000 页"，那"分块"其实退化成了"每次 1 页 + 900 次多余调用"，只是想限速的话反而无害——但**限速逻辑必须按"实际回收页数"算，不能按 N 算**。
+
+SQLite 3.53.4（Node 24 自带 `node:sqlite`）则**按请求搬**：所以同一段脚本在两端行为完全不同，块大小在 node 端才真正等于"最长写延迟"。实测（326 MiB 库 / freelist 71,467 页）：
+- 300 页 + 100 ms 间隔 → 25.7 s，写方 p95 10.7 ms、max 53.5 ms；
+- 2000 页 + 0 ms 间隔 → 2.7 s，写方 p95 940 ms、max 1.14 s，吞吐掉约 80%。
+
+**块大小 = 最坏写延迟**，这句只在"N 被认"的实现里成立。
+
+## 3. 陷阱二：`busy_timeout` 对 `incremental_vacuum` 的语义相反
+
+写方正在写、拿不到锁时：
+- **python / SQLite 3.40.1**：认 `busy_timeout`，于是一次 ivac 会**干等**到超时（20 s 那档就是干等 20 s），表现为"卡住"而不是报错；
+- **node / SQLite 3.53.4**：不认，直接抛 `database is locked`。
+
+所以"写锁占死时体面收手"要按驱动分别写：python 侧把 `busy_timeout` 设**很短**（几十 ms）+ 自己指数退避 + 让路间隔；node 侧捕获异常后同样退避。两边的 `stopped_reason` 建议统一成三类：`budget`（秒级预算到）/ `stall`（连续 N 次没进展）/ `busy`（一直被写锁挡），别把"忙"和"卡死"混成一个。
+
+## 4. 可复用的最小循环（语义无关）
+
+```python
+# 只搬页、不删行；秒级预算；任何时刻可中断续跑
+import sqlite3, time
+con = sqlite3.connect(path, timeout=0.05, isolation_level=None)   # 短 busy_timeout
+con.execute("PRAGMA auto_vacuum")   # 必须是 2(incremental)，否则下面全是空转
+deadline = time.time() + budget_s
+idle = 0
+while time.time() < deadline:
+    before = con.execute("PRAGMA freelist_count").fetchone()[0]
+    if before == 0:
+        break
+    try:
+        con.execute("PRAGMA incremental_vacuum")
+    except sqlite3.OperationalError:          # 被写锁挡住
+        idle += 1; time.sleep(min(0.5, 0.02 * 2 ** idle)); continue
+    after = con.execute("PRAGMA freelist_count").fetchone()[0]
+    if after == before:                        # 没进展 → stall
+        idle += 1
+        if idle >= stall_tries: break
+    else:
+        idle = 0
+    time.sleep(pause_ms / 1000.0)              # 让路间隔
+con.execute("PRAGMA wal_checkpoint(TRUNCATE)") # 收尾，否则文件不算缩
+```
+
+三个必须写死的边界：`auto_vacuum != 2` 直接拒（否则跑一天也不动）、只认你指定的那个库目录、默认 dry-run。
+
+## 5. 线上那次的真实数字
+
+一次实际清理：freelist 52 万页搬空，库 **2.23 GiB → 294 MiB**（释放 1.94 GiB），`quick_check` ok，参数就是上面 b) 那组（块 300 页 / 让路 100 ms）。同一份脚本此前在线上被跑过一次"裸分块"，写方日志里出现了秒级尖峰——对照组和数据都在本机 `lab/` 目录里。
+
+## 6. 怎么复现 / 哪些没验
+
+- 复现：脚本都在 `lab/compact-latency/`（python 四组：ivac 语义探针 / 大库 drain / 令牌桶限速 / `VACUUM INTO` 换库；node 两组延迟对照），全部在临时目录造合成库，结果落 `*-result.json`。
+- 没验：多写方争锁（只单写方）、WAL 超过上限时的行为、网络盘、`VACUUM`（无 INTO，原地）在旧版本是否真的锁整库、以及"边紧凑边被 checkpoint 抢"的组合。
+- 想抄参数：**块 300 页 / 让路 100 ms**（node 端有效）；python 端因为每调用只搬 1 页，等价物是"按回收页数限速 800 页/秒"，实测写方 p95 5.7 ms。
