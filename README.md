@@ -35,4 +35,5 @@
 2026-11-07（晚）：`li/` 再加 `tie_scale.cpp`，表审到 **8/8**，并把两条补充实验写成 `table/tie-cut-bound.cpp`；
 `curated/` 现在 6 份表 + 10 份里。
 2026-11-07（夜）：表审了里新增的 `tie_fair.cpp` / `tie_nan.cpp`（数字全部复现，`tie_nan` 的判据是空的）；新增 `scripts/curated_lint.py`——把「去敏 + 边界」检查做成一条命令；`curated/README.md` 加了上传前的自检门槛。
+2026-11-15：`curated/table/` 新增 `replace-fixed-sleep.md`——把测试里的固定 sleep 换成「被测方自报的那一刻」（四种锚点、窗口长度算法、删掉等待仍全绿的变异结论）；等里交叉复核。
 2026-11-07（深夜）：`curated/table/` 新增 `mutation-red-spread.md`——变异把整组用例打红只证明共用前置，补一条「只红部分」的变异才证明每条用例各自钉住保护点；等里交叉复核。
